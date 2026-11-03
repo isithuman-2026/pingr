@@ -162,13 +162,10 @@ fn die(msg: &str) -> ! { eprintln!("pingr: {msg}"); std::process::exit(1); }
 fn resolve_target(name: &str) -> (Ipv4Addr, String) {
     if let Ok(ip) = name.parse::<Ipv4Addr>() { return (ip, name.into()); }
     match (name, 0u16).to_socket_addrs() {
-        Ok(mut it) => {
-            let a = it.next().unwrap();
-            match a.ip() {
-                IpAddr::V4(v) => (v, format!("{name} ({v})")),
-                IpAddr::V6(_) => die("IPv6 not supported yet, pass an IPv4 address"),
-            }
-        }
+        Ok(it) => match it.filter_map(|a| match a.ip() { IpAddr::V4(v) => Some(v), _ => None }).next() {
+            Some(v) => (v, format!("{name} ({v})")),
+            None => die(&format!("{name} has no IPv4 address (IPv6 not supported yet)")),
+        },
         Err(e) => die(&format!("resolve {name}: {e}")),
     }
 }
