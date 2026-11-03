@@ -1,0 +1,17 @@
+[package]
+name = "pingr"
+version = "0.1.0"
+edition = "2021"
+description = "ping with a live TUI and an MTR-style path trace"
+license = "MIT"
+readme = "README.md"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+ratatui = "0.29"
+crossterm = "0.28"
+libc = "0.2"
+
+[profile.release]
+lto = true
+strip = true
